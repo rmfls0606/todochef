@@ -6,8 +6,13 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		7915A326308BB3D20082ED20 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 7915A325308BB3D20082ED20 /* .gitignore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		7915A317308BB33B0082ED20 /* todochef.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = todochef.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7915A325308BB3D20082ED20 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -30,6 +35,7 @@
 		7915A30E308BB33B0082ED20 = {
 			isa = PBXGroup;
 			children = (
+				7915A325308BB3D20082ED20 /* .gitignore */,
 				7915A319308BB33B0082ED20 /* todochef */,
 				7915A318308BB33B0082ED20 /* Products */,
 			);
@@ -102,6 +108,7 @@
 		7915A315308BB33B0082ED20 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
+				7915A326308BB3D20082ED20 /* .gitignore in Resources */,
 			);
 		};
 /* End PBXResourcesBuildPhase section */
