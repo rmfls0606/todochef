@@ -9,6 +9,9 @@ import SwiftUI
 import Combine
 
 struct BasketView: View {
+    
+    @StateObject private var viewModel = BasketViewModel()
+    
     @State private var todoInputText: String = ""
     
     var body: some View {
@@ -24,7 +27,7 @@ struct BasketView: View {
                     }
                 
                 Button {
-                    print("담기 버튼 클릭")
+                    viewModel.input.createTodoTaskButtonTapped.send(todoInputText)
                 } label: {
                     HStack(spacing: Spacing.xs){
                         Image(systemName: "basket")
