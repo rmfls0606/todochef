@@ -10,7 +10,11 @@ import Combine
 
 struct BasketView: View {
     
-    @StateObject private var viewModel = BasketViewModel()
+    @StateObject private var viewModel: BasketViewModel
+    
+    init(viewModel: BasketViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
     
     @State private var todoInputText: String = ""
     
@@ -69,8 +73,4 @@ struct BasketView: View {
             }
         }
     }
-}
-
-#Preview {
-    BasketView()
 }

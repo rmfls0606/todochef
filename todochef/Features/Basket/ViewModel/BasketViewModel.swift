@@ -10,6 +10,7 @@ import Combine
 
 final class BasketViewModel: ViewModelType{
     
+    private let repository: TaskRepositoryProtocol
     private var cancellables = Set<AnyCancellable>()
     
     var input = Input()
@@ -24,7 +25,8 @@ final class BasketViewModel: ViewModelType{
         var todoIntputText: String = ""
     }
     
-    init(){
+    init(repository: TaskRepositoryProtocol){
+        self.repository = repository
         transform()
     }
     

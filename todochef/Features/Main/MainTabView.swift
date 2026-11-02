@@ -9,6 +9,8 @@ import SwiftUI
 
 struct MainTabView: View {
     
+    let diContainer: AppDIContainer
+    
     @State private var selectedTab: MainTab = .basket
     
     var body: some View {
@@ -28,7 +30,7 @@ struct MainTabView: View {
     private func destination(for tab: MainTab) -> some View{
         switch tab {
         case .basket:
-            BasketView()
+            BasketView(viewModel: diContainer.makeBasketViewModel())
         case .fridge:
             FridgeView()
         case .counter:
@@ -37,8 +39,4 @@ struct MainTabView: View {
             CookbookView()
         }
     }
-}
-
-#Preview {
-    MainTabView()
 }
