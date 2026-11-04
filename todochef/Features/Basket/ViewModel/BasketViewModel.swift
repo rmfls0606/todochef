@@ -5,37 +5,91 @@
 //  Created by 이상민 on 11/2/26.
 //
 
-import Foundation
 import Combine
+import Foundation
 
-final class BasketViewModel: ViewModelType{
-    
+final class BasketViewModel: ViewModelType {
+
     private let repository: TaskRepositoryProtocol
     private var cancellables = Set<AnyCancellable>()
-    
+
     var input = Input()
     @Published var output = Output()
-    
-    struct Input{
+
+    struct Input {
         var todoInputText = PassthroughSubject<String, Never>()
         let createTodoTaskButtonTapped = PassthroughSubject<String, Never>()
+        let onAppear = PassthroughSubject<Void, Never>()
     }
-    
-    struct Output{
-        var todoIntputText: String = ""
+
+    struct Output {
+        var basketResult: [Task] = []
+        var fridgeResult: [Task] = []
+        var isSaving: Bool = false
     }
-    
-    init(repository: TaskRepositoryProtocol){
+
+    init(repository: TaskRepositoryProtocol) {
         self.repository = repository
         transform()
     }
-    
-    func transform(){
-        // TODO: 중복 요청 방지
-        input.createTodoTaskButtonTapped
-            .sink { todoText in
-                print(todoText)
+
+    func transform() {
+        input.onAppear
+            .sink { [weak self] _ in
+                do {
+                    try self?.fetchTodoTask()
+                } catch {
+                    print("불러오기 실패: \(error)")
+                }
             }
             .store(in: &cancellables)
+
+        input.createTodoTaskButtonTapped
+            .throttle(
+                for: .milliseconds(500),
+                scheduler: RunLoop.main,
+                latest: false
+            )
+            .sink { [weak self] todoText in
+                guard let self else { return }
+                self.createTodoTask(todoText)
+            }
+            .store(in: &cancellables)
+    }
+
+    //MARK: - Functions
+    private func createTodoTask(_ inputText: String) {
+        guard !output.isSaving else { return }
+
+        let title =
+            inputText
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !title.isEmpty else { return }
+        
+        output.isSaving = true
+        defer { output.isSaving = false }
+
+        let task = Task(
+            id: UUID(),
+            title: title,
+            inputType: .text,
+            status: .basket,
+            shelf: .later
+        )
+
+        do {
+            try repository.create(task)
+            try fetchTodoTask()
+        } catch {
+            print("할 일 저장 또는 목록 갱신 실패", error)
+        }
+    }
+
+    private func fetchTodoTask() throws {
+        let tasks = try repository.fetchAll()
+        
+        output.basketResult = tasks.filter({$0.status == .basket})
+        output.fridgeResult = tasks.filter({$0.status == .fridge})
     }
 }
