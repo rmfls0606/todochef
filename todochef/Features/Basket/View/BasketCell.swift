@@ -9,6 +9,7 @@ import SwiftUI
 
 struct BasketCell: View{
     let task: Task
+    let onConfirm: (Task, SizeLevel) -> Void
     
     @State private var onSheet: Bool = false
     
@@ -73,7 +74,9 @@ struct BasketCell: View{
         }
         .sheet(isPresented: $onSheet) {
             SetTodoSize(task: task, onConfirm: { level in
-                print(level)
+                onConfirm(task, level)
+                // TODO: 저장 실패 시 시트 닫히지 않게 하고 toast
+                onSheet = false
             })
                 .presentationDetents([.medium,.large])
         }

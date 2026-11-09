@@ -20,6 +20,8 @@ final class BasketViewModel: ViewModelType {
         var todoInputText = PassthroughSubject<String, Never>()
         let createTodoTaskButtonTapped = PassthroughSubject<String, Never>()
         let onAppear = PassthroughSubject<Void, Never>()
+        
+        let confirmTaskSize = PassthroughSubject<(task: Task, level: SizeLevel), Never>()
     }
 
     struct Output {
@@ -53,6 +55,13 @@ final class BasketViewModel: ViewModelType {
             .sink { [weak self] todoText in
                 guard let self else { return }
                 self.createTodoTask(todoText)
+            }
+            .store(in: &cancellables)
+        
+        input.confirmTaskSize
+            .sink { [weak self] task, level in
+                guard let self else { return }
+                self.updateTaskSize(task, level: level)
             }
             .store(in: &cancellables)
     }
@@ -91,5 +100,29 @@ final class BasketViewModel: ViewModelType {
         
         output.basketResult = tasks.filter({$0.status == .basket})
         output.fridgeResult = tasks.filter({$0.status == .fridge})
+    }
+    
+    private func updateTaskSize(_ task: Task, level: SizeLevel){
+        let previousLevel = task.sizeLevel
+        let previousStatus = task.status
+        
+        task.sizeLevel = level
+        task.status = .fridge
+        
+        do{
+            try repository.update(task)
+        }catch{
+            task.sizeLevel = previousLevel
+            task.status = previousStatus
+            
+            print("Task 크기 수정 실패: \(error)")
+            return
+        }
+        
+        do{
+            try fetchTodoTask()
+        }catch{
+            print("Task 목록 새로고침 실패: \(error)")
+        }
     }
 }

@@ -82,7 +82,9 @@ struct BasketView: View {
                     if !viewModel.output.basketResult.isEmpty{
                         Section{
                             ForEach(viewModel.output.basketResult, id: \.id) { task in
-                                BasketCell(task: task)
+                                BasketCell(task: task) { task, level in
+                                    viewModel.input.confirmTaskSize.send((task, level))
+                                }
                             }//: LOOP
                         } header: {
                             Text("크기 정할 재료")
@@ -94,7 +96,9 @@ struct BasketView: View {
                     if !viewModel.output.fridgeResult.isEmpty{
                         Section {
                             ForEach(viewModel.output.fridgeResult, id: \.id){ task in
-                                BasketCell(task: task)
+                                BasketCell(task: task){ task, level in
+                                    viewModel.input.confirmTaskSize.send((task, level))
+                                }
                             }
                         } header: {
                             Text("크기 정한 재료 -> 냉장고 보관함으로")
