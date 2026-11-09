@@ -19,8 +19,9 @@ final class Task{
     var shelf: Shelf // 냉장고 선반
     var cookedAt: Date? // 완료 시각(요리북 기록용)
     var expiredAt: Date? // 유통기한(마감일)
+    var sizeLevel: SizeLevel
     
-    init(id: UUID, title: String, content: String? = nil, inputType: InputType, mediaPath: String? = nil, status: Status, shelf: Shelf, cookedAt: Date? = nil, expiredAt: Date? = nil) {
+    init(id: UUID, title: String, content: String? = nil, inputType: InputType, mediaPath: String? = nil, status: Status, shelf: Shelf, cookedAt: Date? = nil, expiredAt: Date? = nil, sizeLevel: SizeLevel = .zero) {
         self.id = id
         self.title = title
         self.content = content
@@ -30,6 +31,7 @@ final class Task{
         self.shelf = shelf
         self.cookedAt = cookedAt
         self.expiredAt = expiredAt
+        self.sizeLevel = sizeLevel
     }
 }
 
