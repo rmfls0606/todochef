@@ -19,9 +19,8 @@ struct BasketCell: View{
                 .fill(Color.freshnessWaiting)
                 .frame(width: 40, height: 40)
                 .overlay {
-                    Image(systemName: "app.gift")
-                        .resizable()
-                        .frame(width: 20, height: 20)
+                    Text(task.sizeLevel.icon)
+                        .font(.shelfTitle)
                 }
                 .vTop()
             
@@ -33,13 +32,9 @@ struct BasketCell: View{
                     .lineLimit(2)
                     .minimumScaleFactor(0.75)
                 
-                HStack(alignment: .center, spacing: Spacing.xs){
-                    Image(systemName: "app.gift")
-                    
-                    Text(task.content ?? "크기 미정")
-                }//: HSTACK
-                .font(Font.taskTitle)
-                .foregroundStyle(Color.textSecondary)
+                Text(task.sizeLevel != .zero ? "\(task.sizeLevel.label) • \(task.sizeLevel.estimatedTime)" : "🥛 크기 미정")
+                    .font(Font.taskTitle)
+                    .foregroundStyle(Color.textSecondary)
             }//: VSTACK
             
             Spacer()
@@ -50,7 +45,7 @@ struct BasketCell: View{
                 } label: {
                     Text("수정")
                 }
-
+                
                 Button {
                     print("셀 삭제")
                 } label: {
@@ -78,7 +73,7 @@ struct BasketCell: View{
                 // TODO: 저장 실패 시 시트 닫히지 않게 하고 toast
                 onSheet = false
             })
-                .presentationDetents([.medium,.large])
+            .presentationDetents([.medium,.large])
         }
     }
 }
