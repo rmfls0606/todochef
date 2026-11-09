@@ -10,6 +10,8 @@ import SwiftUI
 struct BasketCell: View{
     let task: Task
     
+    @State private var onSheet: Bool = false
+    
     var body: some View{
         HStack(spacing: Spacing.md){
             Circle()
@@ -43,7 +45,7 @@ struct BasketCell: View{
             
             Menu{
                 Button {
-                    print("셀 수정")
+                    onSheet.toggle()
                 } label: {
                     Text("수정")
                 }
@@ -68,6 +70,12 @@ struct BasketCell: View{
         .background{
             RoundedRectangle(cornerRadius: CornerRadius.medium)
                 .fill(Color.surface)
+        }
+        .sheet(isPresented: $onSheet) {
+            SetTodoSize(task: task, onConfirm: { level in
+                print(level)
+            })
+                .presentationDetents([.medium,.large])
         }
     }
 }
