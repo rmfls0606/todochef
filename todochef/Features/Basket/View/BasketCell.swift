@@ -10,6 +10,7 @@ import SwiftUI
 struct BasketCell: View{
     let task: Task
     let onConfirm: (Task, SizeLevel) -> Void
+    let onDelete: (Task) -> Void
     
     @State private var onSheet: Bool = false
     
@@ -47,7 +48,7 @@ struct BasketCell: View{
                 }
                 
                 Button {
-                    print("셀 삭제")
+                    onDelete(task)
                 } label: {
                     Text("삭제")
                 }

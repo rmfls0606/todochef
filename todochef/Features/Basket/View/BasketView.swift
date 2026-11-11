@@ -87,7 +87,10 @@ struct BasketView: View {
                             ForEach(viewModel.output.basketResult, id: \.id) { task in
                                 BasketCell(task: task) { task, level in
                                     viewModel.input.confirmTaskSize.send((task, level))
+                                } onDelete: { task in
+                                    viewModel.input.deleteTodoButtonTapped.send(task)
                                 }
+
                             }//: LOOP
                         } header: {
                             Text("크기 정할 재료")
@@ -101,6 +104,8 @@ struct BasketView: View {
                             ForEach(viewModel.output.fridgeResult, id: \.id){ task in
                                 BasketCell(task: task){ task, level in
                                     viewModel.input.confirmTaskSize.send((task, level))
+                                } onDelete: { task in
+                                    viewModel.input.deleteTodoButtonTapped.send(task)
                                 }
                             }
                         } header: {
