@@ -114,37 +114,6 @@ struct TaskSizeSlider: View {
                 )
             }//: GeometryReader
             .frame(height: sliderHeight)
-            
-            // MARK: - Labels
-            HStack(spacing: 0) {
-                ForEach(Array(levels.enumerated()), id: \.element) { index, level in
-                    Button {
-                        selectedLevel = level
-                    } label: {
-                        VStack(spacing: Spacing.xs) {
-                            Text(level.icon)
-                                .font(.shelfTitle)
-                            
-                            Text(level.label)
-                                .font(.taskTitle)
-                                .foregroundStyle(
-                                    selectedLevel == level
-                                    ? Color.textPrimary
-                                    : Color.textSecondary
-                                )
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.8)
-                        }//: VSTACK
-//                        .hCenter()
-                    }
-                    .buttonStyle(.plain)
-//                    .background(.green)
-                    
-                    if index < levels.count - 1{
-                        Spacer(minLength: 0)
-                    }
-                }//: LOOP
-            }//: HSTACK
         }//: VSTACK
     }
 }

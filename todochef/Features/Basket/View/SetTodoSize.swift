@@ -44,16 +44,16 @@ struct SetTodoSize: View {
                 .fill(Color.freshnessWaiting)
                 .frame(width: 60, height: 60)
                 .overlay {
-                    Text(task.sizeLevel.icon)
+                    Text(selectedLevel.icon)
                         .font(.brandTitle)
                 }
             
             VStack(spacing: Spacing.sm){
-                Text(task.sizeLevel.label)
+                Text(selectedLevel.label)
                     .font(.shelfTitle)
                 
                 VStack(spacing: Spacing.xs){
-                    Text(task.sizeLevel.description)
+                    Text(selectedLevel.description)
                         .font(.bodyText)
                         .fontWeight(.bold)
                     
