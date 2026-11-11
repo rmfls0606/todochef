@@ -26,6 +26,10 @@ final class BasketViewModel: ViewModelType {
     }
 
     struct Output {
+        var todoInputText: String = ""
+        var showTodoLengthLimitMessage: Bool = false
+        var canCreateTodo: Bool = false
+        
         var basketResult: [Task] = []
         var fridgeResult: [Task] = []
         var isSaving: Bool = false
@@ -37,6 +41,18 @@ final class BasketViewModel: ViewModelType {
     }
 
     func transform() {
+        input.todoInputText
+            .sink { [weak self] inputText in
+                guard let self else { return }
+                
+                let trimmedText = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+                
+                output.todoInputText = trimmedText
+                output.showTodoLengthLimitMessage = inputText.count > 20
+                output.canCreateTodo = !trimmedText.isEmpty && inputText.count <= 20
+            }
+            .store(in: &cancellables)
+        
         input.onAppear
             .sink { [weak self] _ in
                 do {
@@ -83,6 +99,7 @@ final class BasketViewModel: ViewModelType {
             .trimmingCharacters(in: .whitespacesAndNewlines)
 
         guard !title.isEmpty else { return }
+        guard title.count <= 20 else { return }
         
         output.isSaving = true
         defer { output.isSaving = false }
@@ -98,6 +115,10 @@ final class BasketViewModel: ViewModelType {
         do {
             try repository.create(task)
             try fetchTodoTask()
+            
+            output.todoInputText = ""
+            output.showTodoLengthLimitMessage = false
+            output.canCreateTodo = false
         } catch {
             print("할 일 저장 또는 목록 갱신 실패", error)
         }

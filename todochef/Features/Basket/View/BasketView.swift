@@ -17,11 +17,18 @@ struct BasketView: View {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
     
-    @State private var todoInputText: String = ""
-    
     private var isBasketEmpty: Bool{
         viewModel.output.basketResult.isEmpty &&
         viewModel.output.fridgeResult.isEmpty
+    }
+    
+    private var todoInputTextBinding: Binding<String>{
+        Binding {
+            viewModel.output.todoInputText
+        } set: { newValue in
+            viewModel.input.todoInputText.send(newValue)
+        }
+        
     }
     
     var body: some View {
@@ -49,27 +56,34 @@ struct BasketView: View {
             .padding(.top, Spacing.lg)
             .padding(.horizontal, Spacing.lg)
             
-            HStack(spacing: Spacing.sm){
-                Text("할 일을 입력하세요")
-                    .font(.bodyText)
-                    .hidden()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .overlay(alignment: .leading) {
-                        TextField("할 일을 입력하세요", text: $todoInputText)
-                            .focused($isTodoInputFocused)
-                            .font(.bodyText)
-                            .textFieldStyle(.plain)
+            HStack(alignment: .top, spacing: Spacing.sm){
+                VStack(alignment: .trailing){
+                    Text("할 일을 입력하세요")
+                        .font(.bodyText)
+                        .hidden()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .overlay(alignment: .leading) {
+                            TextField("할 일을 입력하세요", text: todoInputTextBinding)
+                                .focused($isTodoInputFocused)
+                                .font(.bodyText)
+                                .textFieldStyle(.plain)
+                        }
+                        .padding(Spacing.md)
+                        .background {
+                            RoundedRectangle(cornerRadius: CornerRadius.medium)
+                                .fill(Color.surface)
+                                .stroke(viewModel.output.showTodoLengthLimitMessage ? Color.freshnessExpired : Color.divider, lineWidth: 1)
+                        }
+                    
+                    if viewModel.output.showTodoLengthLimitMessage{
+                        Text("할 일은 최대 20자까지 입력할 수 있어요")
+                            .font(.freshnessLabel)
+                            .foregroundStyle(.freshnessExpired)
                     }
-                    .padding(Spacing.md)
-                    .background {
-                        RoundedRectangle(cornerRadius: CornerRadius.medium)
-                            .fill(Color.surface)
-                            .stroke(Color.divider, lineWidth: 1)
-                    }
+                }//: VSTACK
                 
                 Button {
-                    viewModel.input.createTodoTaskButtonTapped.send(todoInputText)
-                    todoInputText = ""
+                    viewModel.input.createTodoTaskButtonTapped.send(viewModel.output.todoInputText)
                     isTodoInputFocused = false
                 } label: {
                     HStack(spacing: Spacing.xs){
@@ -81,16 +95,16 @@ struct BasketView: View {
                     .fontWeight(.bold)
                     .foregroundStyle(.textPrimary)
                 }
-                .disabled(viewModel.output.isSaving)
                 .padding(Spacing.md)
                 .background{
                     RoundedRectangle(cornerRadius: CornerRadius.medium)
                         .fill(Color.freshnessSoon)
                         .stroke(Color.freshnessSoon, lineWidth: 1)
                 }
+                .disabled(viewModel.output.isSaving || !viewModel.output.canCreateTodo)
             }//: HSTACK
             .padding(.horizontal, Spacing.lg)
-            
+
             basketContent
         }//: VSTACK
         .vTop()
@@ -127,7 +141,7 @@ struct BasketView: View {
                             } onDelete: { task in
                                 viewModel.input.deleteTodoButtonTapped.send(task)
                             }
-
+                            
                         }//: LOOP
                     } header: {
                         Text("크기 정할 재료")
