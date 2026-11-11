@@ -11,6 +11,7 @@ import Combine
 struct BasketView: View {
     
     @StateObject private var viewModel: BasketViewModel
+    @FocusState private var isTodoInputFocused: Bool
     
     init(viewModel: BasketViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -45,6 +46,7 @@ struct BasketView: View {
             
             HStack{
                 TextField("할 일을 입력하세요", text: $todoInputText)
+                    .focused($isTodoInputFocused)
                     .font(.bodyText)
                     .padding(Spacing.md)
                     .background{
@@ -56,6 +58,7 @@ struct BasketView: View {
                 Button {
                     viewModel.input.createTodoTaskButtonTapped.send(todoInputText)
                     todoInputText = ""
+                    isTodoInputFocused = false
                 } label: {
                     HStack(spacing: Spacing.xs){
                         Image(systemName: "basket")
@@ -111,11 +114,15 @@ struct BasketView: View {
                 .padding(.horizontal, Spacing.lg)
             }//: SCROLLVIEW
             .scrollBounceBehavior(.basedOnSize)
+            .scrollDismissesKeyboard(.immediately)
         }//: VSTACK
         .vTop()
         .background(.appBackground)
         .onAppear {
             viewModel.input.onAppear.send(())
+        }
+        .onTapGesture {
+            isTodoInputFocused = false
         }
     }
 }
