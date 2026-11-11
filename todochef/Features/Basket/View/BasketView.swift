@@ -49,12 +49,19 @@ struct BasketView: View {
             .padding(.top, Spacing.lg)
             .padding(.horizontal, Spacing.lg)
             
-            HStack{
-                TextField("할 일을 입력하세요", text: $todoInputText)
-                    .focused($isTodoInputFocused)
+            HStack(spacing: Spacing.sm){
+                Text("할 일을 입력하세요")
                     .font(.bodyText)
+                    .hidden()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .overlay(alignment: .leading) {
+                        TextField("할 일을 입력하세요", text: $todoInputText)
+                            .focused($isTodoInputFocused)
+                            .font(.bodyText)
+                            .textFieldStyle(.plain)
+                    }
                     .padding(Spacing.md)
-                    .background{
+                    .background {
                         RoundedRectangle(cornerRadius: CornerRadius.medium)
                             .fill(Color.surface)
                             .stroke(Color.divider, lineWidth: 1)
