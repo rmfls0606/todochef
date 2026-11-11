@@ -19,6 +19,11 @@ struct BasketView: View {
     
     @State private var todoInputText: String = ""
     
+    private var isBasketEmpty: Bool{
+        viewModel.output.basketResult.isEmpty &&
+        viewModel.output.fridgeResult.isEmpty
+    }
+    
     var body: some View {
         VStack(spacing: Spacing.md){
             //MARK: - Header
@@ -79,47 +84,7 @@ struct BasketView: View {
             }//: HSTACK
             .padding(.horizontal, Spacing.lg)
             
-            //MARK: - Content
-            ScrollView(.vertical) {
-                LazyVStack(alignment: .leading, spacing: Spacing.sm){
-                    if !viewModel.output.basketResult.isEmpty{
-                        Section{
-                            ForEach(viewModel.output.basketResult, id: \.id) { task in
-                                BasketCell(task: task) { task, level in
-                                    viewModel.input.confirmTaskSize.send((task, level))
-                                } onDelete: { task in
-                                    viewModel.input.deleteTodoButtonTapped.send(task)
-                                }
-
-                            }//: LOOP
-                        } header: {
-                            Text("크기 정할 재료")
-                                .font(.shelfTitle)
-                                .foregroundStyle(Color.textPrimary)
-                        }
-                    }
-                    
-                    if !viewModel.output.fridgeResult.isEmpty{
-                        Section {
-                            ForEach(viewModel.output.fridgeResult, id: \.id){ task in
-                                BasketCell(task: task){ task, level in
-                                    viewModel.input.confirmTaskSize.send((task, level))
-                                } onDelete: { task in
-                                    viewModel.input.deleteTodoButtonTapped.send(task)
-                                }
-                            }
-                        } header: {
-                            Text("크기 정한 재료 -> 냉장고 보관함으로")
-                                .font(.shelfTitle)
-                                .foregroundStyle(Color.textPrimary)
-                                .padding(.top, viewModel.output.basketResult.isEmpty ? 0 : Spacing.md)
-                        }
-                    }
-                }//: LazyVStack
-                .padding(.horizontal, Spacing.lg)
-            }//: SCROLLVIEW
-            .scrollBounceBehavior(.basedOnSize)
-            .scrollDismissesKeyboard(.immediately)
+            basketContent
         }//: VSTACK
         .vTop()
         .background(.appBackground)
@@ -129,5 +94,61 @@ struct BasketView: View {
         .onTapGesture {
             isTodoInputFocused = false
         }
+    }
+    
+    @ViewBuilder
+    private var basketContent: some View{
+        if isBasketEmpty{
+            EmptyStateView(title: nil, description: """
+                아직 담은 재료가 없어요
+                할 일을 적어서 새 재료를 추가해 보세요.
+                """)
+        }else{
+            basketListContent
+        }
+    }
+    
+    private var basketListContent: some View{
+        //MARK: - Content
+        ScrollView(.vertical) {
+            LazyVStack(alignment: .leading, spacing: Spacing.sm){
+                if !viewModel.output.basketResult.isEmpty{
+                    Section{
+                        ForEach(viewModel.output.basketResult, id: \.id) { task in
+                            BasketCell(task: task) { task, level in
+                                viewModel.input.confirmTaskSize.send((task, level))
+                            } onDelete: { task in
+                                viewModel.input.deleteTodoButtonTapped.send(task)
+                            }
+
+                        }//: LOOP
+                    } header: {
+                        Text("크기 정할 재료")
+                            .font(.shelfTitle)
+                            .foregroundStyle(Color.textPrimary)
+                    }
+                }
+                
+                if !viewModel.output.fridgeResult.isEmpty{
+                    Section {
+                        ForEach(viewModel.output.fridgeResult, id: \.id){ task in
+                            BasketCell(task: task){ task, level in
+                                viewModel.input.confirmTaskSize.send((task, level))
+                            } onDelete: { task in
+                                viewModel.input.deleteTodoButtonTapped.send(task)
+                            }
+                        }
+                    } header: {
+                        Text("크기 정한 재료 -> 냉장고 보관함으로")
+                            .font(.shelfTitle)
+                            .foregroundStyle(Color.textPrimary)
+                            .padding(.top, viewModel.output.basketResult.isEmpty ? 0 : Spacing.md)
+                    }
+                }
+            }//: LazyVStack
+            .padding(.horizontal, Spacing.lg)
+        }//: SCROLLVIEW
+        .scrollBounceBehavior(.basedOnSize)
+        .scrollDismissesKeyboard(.immediately)
     }
 }
