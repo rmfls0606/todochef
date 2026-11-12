@@ -35,31 +35,23 @@ struct SetTodoSize: View {
                     Text("크기 정하기")
                         .font(.shelfTitle)
                 }//: HSTACK
-                
-                Text("\"\(task.title)\"")
-                    .font(.bodyText)
             }//: VSTACK
             
-            Circle()
-                .fill(Color.freshnessWaiting)
-                .frame(width: 60, height: 60)
-                .overlay {
-                    Text(selectedLevel.icon)
-                        .font(.brandTitle)
-                }
-            
-            VStack(spacing: Spacing.sm){
+            HStack(spacing: Spacing.xs){
+                Text(selectedLevel.icon)
+                    .font(.brandTitle)
+                
                 Text(selectedLevel.label)
                     .font(.shelfTitle)
+            }//: HSTACK
+            
+            VStack(spacing: Spacing.xs){
+                Text(selectedLevel.description)
+                    .font(.bodyText)
+                    .fontWeight(.bold)
                 
-                VStack(spacing: Spacing.xs){
-                    Text(selectedLevel.description)
-                        .font(.bodyText)
-                        .fontWeight(.bold)
-                    
-                    Text(task.sizeLevel.estimatedTime)
-                        .font(.bodyText)
-                }//: VSTACK
+                Text(task.sizeLevel.estimatedTime)
+                    .font(.bodyText)
             }//: VSTACK
             
             TaskSizeSlider(selectedLevel: $selectedLevel)
@@ -77,7 +69,7 @@ struct SetTodoSize: View {
                     RoundedRectangle(cornerRadius: CornerRadius.medium)
                         .fill(.appBackground)
                 })
-
+                
                 //확인
                 Button {
                     onConfirm(selectedLevel)
