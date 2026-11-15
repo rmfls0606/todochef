@@ -23,6 +23,12 @@ final class BasketViewModel: ViewModelType {
         let onAppear = PassthroughSubject<Void, Never>()
         
         let confirmTaskSize = PassthroughSubject<(task: Task, level: SizeLevel), Never>()
+        
+        //선택 관련
+        let selectionModeButtonTapped = PassthroughSubject<Void, Never>()
+        let taskSelectionTapped = PassthroughSubject<UUID, Never>()
+        let selectedAllButtonTapped = PassthroughSubject<Void, Never>()
+        let batchSizeConfirmed = PassthroughSubject<SizeLevel, Never>()
     }
 
     struct Output {
@@ -33,6 +39,25 @@ final class BasketViewModel: ViewModelType {
         var basketResult: [Task] = []
         var fridgeResult: [Task] = []
         var isSaving: Bool = false
+        
+        //선택 관련
+        var isSelectionMode: Bool = false
+        var selectedTaskIDs: Set<UUID> = []
+        
+        var selectionCount: Int {
+            selectedTaskIDs.count
+        }
+        
+        var basketTaskIDs: Set<UUID> {
+            Set(
+                basketResult
+                    .map(\.id)
+            )
+        }
+        
+        var isAllBasketSelected: Bool {
+            !basketTaskIDs.isEmpty && basketTaskIDs.isSubset(of: selectedTaskIDs)
+        }
     }
 
     init(repository: TaskRepositoryProtocol) {
@@ -86,6 +111,54 @@ final class BasketViewModel: ViewModelType {
             .sink { [weak self] task in
                 guard let self else { return }
                 self.deleteTask(task)
+            }
+            .store(in: &cancellables)
+        
+        //선택 관련
+        input.selectionModeButtonTapped
+            .sink { [weak self] _ in
+                guard let self else { return }
+                
+                output.isSelectionMode.toggle()
+                
+                if !output.isSelectionMode{
+                    output.selectedTaskIDs.removeAll()
+                }
+            }
+            .store(in: &cancellables)
+        
+        input.taskSelectionTapped
+            .sink { [weak self] taskID in
+                guard let self else { return }
+                
+                if output.selectedTaskIDs.contains(taskID){
+                    output.selectedTaskIDs.remove(taskID)
+                }else{
+                    output.selectedTaskIDs.insert(taskID)
+                }
+            }
+            .store(in: &cancellables)
+        
+        input.selectedAllButtonTapped
+            .sink { [weak self] _ in
+                guard let self else { return }
+                
+                let unspecifiedIDs = output.basketTaskIDs
+                
+                guard !unspecifiedIDs.isEmpty else { return }
+                
+                if output.isAllBasketSelected{
+                    output.selectedTaskIDs.removeAll()
+                }else{
+                    output.selectedTaskIDs = unspecifiedIDs
+                }
+            }
+            .store(in: &cancellables)
+        
+        input.batchSizeConfirmed
+            .sink { [weak self] level in
+                guard let self else { return }
+                self.updateSelectedTasksizes(level: level)
             }
             .store(in: &cancellables)
     }
@@ -166,6 +239,40 @@ final class BasketViewModel: ViewModelType {
             try fetchTodoTask()
         }catch{
             print("Task 목록 새로고침 실패: \(error)")
+        }
+    }
+    
+    private func updateSelectedTasksizes(level: SizeLevel){
+        let selectedTasks = output.basketResult.filter { task in
+            output.selectedTaskIDs.contains(task.id)
+        }
+        guard !selectedTasks.isEmpty else { return }
+        
+        let previousValues = selectedTasks.map { task in
+            (task: task, level: task.sizeLevel, status: task.status)
+        }
+        
+        selectedTasks.forEach { task in
+            task.sizeLevel = level
+            task.status = .fridge
+        }
+        
+        do{
+            for task in selectedTasks{
+                try repository.update(task)
+            }
+            
+            try fetchTodoTask()
+            
+            output.selectedTaskIDs.removeAll()
+            output.isSelectionMode = false
+        } catch {
+            previousValues.forEach {
+                $0.task.sizeLevel = $0.level
+                $0.task.status = $0.status
+            }
+            
+            print("일괄 크기 변경 실패: \(error)")
         }
     }
 }

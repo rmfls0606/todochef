@@ -33,28 +33,8 @@ struct BasketView: View {
     
     var body: some View {
         VStack(spacing: Spacing.md){
-            //MARK: - Header
-            HStack{
-                HStack(spacing: Spacing.xs){
-                    Image(systemName: "basket")
-                        .font(.shelfTitle)
-                    
-                    Text("장바구니")
-                        .font(.screenTitle)
-                }//: HSTACK
-                .foregroundStyle(Color.textPrimary)
-                
-                Spacer()
-                
-                Button {
-                    print("냉장고 이동")
-                } label: {
-                    Image(systemName: "refrigerator")
-                        .font(.shelfTitle)
-                }
-            }//: HSTACK
-            .padding(.top, Spacing.lg)
-            .padding(.horizontal, Spacing.lg)
+            //Header
+            basketHeader
             
             HStack(alignment: .top, spacing: Spacing.sm){
                 VStack(alignment: .trailing){
@@ -117,6 +97,7 @@ struct BasketView: View {
         }
     }
     
+    //MARK: - Basket Content
     @ViewBuilder
     private var basketContent: some View{
         if isBasketEmpty{
@@ -136,10 +117,12 @@ struct BasketView: View {
                 if !viewModel.output.basketResult.isEmpty{
                     Section{
                         ForEach(viewModel.output.basketResult, id: \.id) { task in
-                            BasketCell(task: task) { task, level in
+                            BasketCell(task: task, isSelectionMode: viewModel.output.isSelectionMode, isSelected: viewModel.output.selectedTaskIDs.contains(task.id)) { task, level in
                                 viewModel.input.confirmTaskSize.send((task, level))
                             } onDelete: { task in
                                 viewModel.input.deleteTodoButtonTapped.send(task)
+                            } onSelection: { task in
+                                viewModel.input.taskSelectionTapped.send(task.id)
                             }
                             
                         }//: LOOP
@@ -153,10 +136,12 @@ struct BasketView: View {
                 if !viewModel.output.fridgeResult.isEmpty{
                     Section {
                         ForEach(viewModel.output.fridgeResult, id: \.id){ task in
-                            BasketCell(task: task){ task, level in
+                            BasketCell(task: task, isSelectionMode: viewModel.output.isSelectionMode, isSelected: viewModel.output.selectedTaskIDs.contains(task.id)) { task, level in
                                 viewModel.input.confirmTaskSize.send((task, level))
                             } onDelete: { task in
                                 viewModel.input.deleteTodoButtonTapped.send(task)
+                            } onSelection: { task in
+                                viewModel.input.taskSelectionTapped.send(task.id)
                             }
                         }
                     } header: {
@@ -172,4 +157,72 @@ struct BasketView: View {
         .scrollBounceBehavior(.basedOnSize)
         .scrollDismissesKeyboard(.immediately)
     }
+    
+    //MARK: - Header
+    @ViewBuilder
+    private var basketHeader: some View{
+        HStack{
+            if viewModel.output.isSelectionMode{
+                HStack(spacing: Spacing.md) {
+                    Button {
+                        viewModel.input.selectionModeButtonTapped.send(())
+                    } label: {
+                        Image(systemName: "xmark")
+                    }
+                    
+                    Text("\(viewModel.output.selectionCount)개 선택")
+                }
+                .font(.shelfTitle)
+                .foregroundStyle(Color.textPrimary)
+                
+                Spacer()
+                
+                Button {
+                    viewModel.input.selectedAllButtonTapped.send(())
+                } label: {
+                    Text(viewModel.output.isAllBasketSelected ? "전체 해제" : "전체 선택")
+                        .font(.bodyText)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.textPrimary)
+                        .padding(.vertical, Spacing.sm)
+                        .padding(.horizontal, Spacing.md)
+                        .background {
+                            RoundedRectangle(cornerRadius: Spacing.md)
+                                .fill(.freshnessNormal)
+                        }
+                }
+                .buttonStyle(.plain)
+            }else{
+                HStack(spacing: Spacing.xs){
+                    Image(systemName: "basket")
+                        .font(.shelfTitle)
+                    
+                    Text("장바구니")
+                        .font(.screenTitle)
+                }//: HSTACK
+                .foregroundStyle(Color.textPrimary)
+                
+                Spacer()
+                
+                Button {
+                    viewModel.input.selectionModeButtonTapped.send(())
+                } label: {
+                    Text("선택")
+                        .font(.bodyText)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.textPrimary)
+                        .padding(.vertical, Spacing.sm)
+                        .padding(.horizontal, Spacing.md)
+                        .background {
+                            RoundedRectangle(cornerRadius: Spacing.md)
+                                .fill(.freshnessNormal)
+                        }
+                        .buttonStyle(.plain)
+                }
+            }
+        }//: HSTACK
+        .padding(.top, Spacing.lg)
+        .padding(.horizontal, Spacing.lg)
+    }
+
 }
