@@ -202,6 +202,9 @@ final class BasketViewModel: ViewModelType {
         
         output.basketResult = tasks.filter({$0.status == .basket})
         output.fridgeResult = tasks.filter({$0.status == .fridge})
+        
+        let selectableTaskIDs = Set(output.basketResult.map(\.id))
+        output.selectedTaskIDs.formIntersection(selectableTaskIDs)
     }
     
     private func updateTaskSize(_ task: Task, level: SizeLevel){

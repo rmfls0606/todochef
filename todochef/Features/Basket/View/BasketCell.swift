@@ -79,11 +79,11 @@ struct BasketCell: View{
         .hLeading()
         .background{
             RoundedRectangle(cornerRadius: CornerRadius.medium)
-                .fill(isSelected ? Color.freshnessNormal.opacity(0.3) : Color.surface)
+                .fill(isSelected && task.status == .basket ? Color.freshnessNormal.opacity(0.3) : Color.surface)
         }
         .overlay(content: {
             RoundedRectangle(cornerRadius: CornerRadius.medium)
-                .stroke(isSelected ? Color.freshnessSoon.opacity(0.5) : Color.surface, lineWidth: 1)
+                .stroke(isSelected && task.status == .basket ? Color.freshnessSoon.opacity(0.5) : Color.surface, lineWidth: 1)
         })
         .sheet(isPresented: $onSheet) {
             SetTodoSize(task: task, onConfirm: { level in
