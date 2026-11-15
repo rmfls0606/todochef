@@ -170,7 +170,7 @@ struct BasketView: View {
                         Image(systemName: "xmark")
                     }
                     
-                    Text("\(viewModel.output.selectionCount)개 선택")
+                    Text("\(viewModel.output.selectionCount)개의 재료가 선택됨")
                 }
                 .font(.shelfTitle)
                 .foregroundStyle(Color.textPrimary)
@@ -188,7 +188,7 @@ struct BasketView: View {
                         .padding(.horizontal, Spacing.md)
                         .background {
                             RoundedRectangle(cornerRadius: Spacing.md)
-                                .fill(.freshnessNormal)
+                                .fill(viewModel.output.isAllBasketSelected ? .freshnessNormal : .appBackground)
                         }
                 }
                 .buttonStyle(.plain)
