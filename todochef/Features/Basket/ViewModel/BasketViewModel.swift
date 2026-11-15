@@ -198,13 +198,22 @@ final class BasketViewModel: ViewModelType {
     }
 
     private func fetchTodoTask() throws {
+        //목록을 변경하기 전체 상태 저장
+        let shouldKeepAllSelected = output.isSelectionMode && output.isAllBasketSelected
+        
         let tasks = try repository.fetchAll()
         
         output.basketResult = tasks.filter({$0.status == .basket})
         output.fridgeResult = tasks.filter({$0.status == .fridge})
         
         let selectableTaskIDs = Set(output.basketResult.map(\.id))
-        output.selectedTaskIDs.formIntersection(selectableTaskIDs)
+        
+        if shouldKeepAllSelected{
+            //새로 추가된 Task까지 모두 선택
+            output.selectedTaskIDs = selectableTaskIDs
+        }else{
+            output.selectedTaskIDs.formIntersection(selectableTaskIDs)
+        }
     }
     
     private func updateTaskSize(_ task: Task, level: SizeLevel){
