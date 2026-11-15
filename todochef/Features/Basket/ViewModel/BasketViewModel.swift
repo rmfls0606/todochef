@@ -117,7 +117,7 @@ final class BasketViewModel: ViewModelType {
         //선택 관련
         input.selectionModeButtonTapped
             .sink { [weak self] _ in
-                guard let self else { return }
+                guard let self, !output.basketResult.isEmpty else { return }
                 
                 output.isSelectionMode.toggle()
                 
@@ -206,13 +206,31 @@ final class BasketViewModel: ViewModelType {
         output.basketResult = tasks.filter({$0.status == .basket})
         output.fridgeResult = tasks.filter({$0.status == .fridge})
         
-        let selectableTaskIDs = Set(output.basketResult.map(\.id))
+        let basketIDs = Set(output.basketResult.map(\.id))
+        
+        if output.basketResult.isEmpty{
+            output.selectedTaskIDs.removeAll()
+            output.isSelectionMode = false
+            return
+        }
+        
+        //장바구니가 비면 선택 모드 종료
+        guard !output.basketResult.isEmpty else {
+            output.selectedTaskIDs.removeAll()
+            output.isSelectionMode = false
+            return
+        }
+        
+        guard output.isSelectionMode else {
+            output.selectedTaskIDs.removeAll()
+            return
+        }
         
         if shouldKeepAllSelected{
             //새로 추가된 Task까지 모두 선택
-            output.selectedTaskIDs = selectableTaskIDs
+            output.selectedTaskIDs = basketIDs
         }else{
-            output.selectedTaskIDs.formIntersection(selectableTaskIDs)
+            output.selectedTaskIDs.formIntersection(basketIDs)
         }
     }
     
