@@ -63,26 +63,26 @@ struct SetTodoSize: View {
                         dismiss()
                     } label: {
                         Text("취소")
+                            .hCenter()
+                            .padding(Spacing.md)
+                            .background(content: {
+                                RoundedRectangle(cornerRadius: CornerRadius.medium)
+                                    .fill(.appBackground)
+                            })
                     }
-                    .hCenter()
-                    .padding(Spacing.md)
-                    .background(content: {
-                        RoundedRectangle(cornerRadius: CornerRadius.medium)
-                            .fill(.appBackground)
-                    })
                     
                     //확인
                     Button {
                         onConfirm(selectedLevel)
                     } label: {
                         Text("확인")
+                            .hCenter()
+                            .padding(Spacing.md)
+                            .background(content: {
+                                RoundedRectangle(cornerRadius: CornerRadius.medium)
+                                    .fill(.orange)
+                            })
                     }
-                    .hCenter()
-                    .padding(Spacing.md)
-                    .background(content: {
-                        RoundedRectangle(cornerRadius: CornerRadius.medium)
-                            .fill(.orange)
-                    })
                 }//: HSTACK
                 .font(.shelfTitle)
                 .foregroundStyle(.textPrimary)
