@@ -50,42 +50,44 @@ struct SetTodoSize: View {
                     .font(.bodyText)
                     .fontWeight(.bold)
                 
-                Text(task.sizeLevel.estimatedTime)
+                Text(selectedLevel.estimatedTime)
                     .font(.bodyText)
             }//: VSTACK
             
-            TaskSizeSlider(selectedLevel: $selectedLevel)
-            
-            HStack(spacing: Spacing.lg){
-                //취소
-                Button {
-                    dismiss()
-                } label: {
-                    Text("취소")
-                }
-                .hCenter()
-                .padding(Spacing.md)
-                .background(content: {
-                    RoundedRectangle(cornerRadius: CornerRadius.medium)
-                        .fill(.appBackground)
-                })
+            VStack(spacing: Spacing.xxl){
+                TaskSizeSlider(selectedLevel: $selectedLevel)
                 
-                //확인
-                Button {
-                    onConfirm(selectedLevel)
-                } label: {
-                    Text("확인")
-                }
-                .hCenter()
-                .padding(Spacing.md)
-                .background(content: {
-                    RoundedRectangle(cornerRadius: CornerRadius.medium)
-                        .fill(.orange)
-                })
-            }//: HSTACK
-            .font(.shelfTitle)
-            .foregroundStyle(.textPrimary)
+                HStack(spacing: Spacing.lg){
+                    //취소
+                    Button {
+                        dismiss()
+                    } label: {
+                        Text("취소")
+                    }
+                    .hCenter()
+                    .padding(Spacing.md)
+                    .background(content: {
+                        RoundedRectangle(cornerRadius: CornerRadius.medium)
+                            .fill(.appBackground)
+                    })
+                    
+                    //확인
+                    Button {
+                        onConfirm(selectedLevel)
+                    } label: {
+                        Text("확인")
+                    }
+                    .hCenter()
+                    .padding(Spacing.md)
+                    .background(content: {
+                        RoundedRectangle(cornerRadius: CornerRadius.medium)
+                            .fill(.orange)
+                    })
+                }//: HSTACK
+                .font(.shelfTitle)
+                .foregroundStyle(.textPrimary)
+            }//: VSTACK
         }//: VSTACK
-        .padding(.horizontal, Spacing.lg)
+        .padding(Spacing.lg)
     }
 }
