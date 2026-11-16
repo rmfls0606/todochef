@@ -31,6 +31,18 @@ final class SwiftDataTaskRepository: TaskRepositoryProtocol{
         try modelContext.save()
     }
     
+    func update(_ tasks: [Task]) throws{
+        guard !tasks.isEmpty else { return }
+        guard modelContext.hasChanges else { return }
+        
+        do{
+            try modelContext.save()
+        } catch {
+            modelContext.rollback()
+            throw error
+        }
+    }
+    
     func delete(_ task: Task) throws {
         modelContext.delete(task)
         try modelContext.save()

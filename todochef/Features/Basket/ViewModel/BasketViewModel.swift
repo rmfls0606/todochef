@@ -272,25 +272,14 @@ final class BasketViewModel: ViewModelType {
         }
         guard !selectedTasks.isEmpty else { return }
         
-        let previousValues = selectedTasks.map { task in
-            (task: task, level: task.sizeLevel, status: task.status)
-        }
-        
         selectedTasks.forEach { task in
             task.sizeLevel = level
             task.status = .fridge
         }
         
         do{
-            for task in selectedTasks{
-                try repository.update(task)
-            }
+            try repository.update(selectedTasks)
         } catch {
-            previousValues.forEach {
-                $0.task.sizeLevel = $0.level
-                $0.task.status = $0.status
-            }
-            
             print("일괄 크기 변경 실패: \(error)")
             return
         }
