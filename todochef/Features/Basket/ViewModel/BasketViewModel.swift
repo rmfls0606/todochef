@@ -158,7 +158,7 @@ final class BasketViewModel: ViewModelType {
         input.batchSizeConfirmed
             .sink { [weak self] level in
                 guard let self else { return }
-                self.updateSelectedTasksizes(level: level)
+                self.updateSelectedTaskSizes(level: level)
             }
             .store(in: &cancellables)
     }
@@ -207,12 +207,6 @@ final class BasketViewModel: ViewModelType {
         output.fridgeResult = tasks.filter({$0.status == .fridge})
         
         let basketIDs = Set(output.basketResult.map(\.id))
-        
-        if output.basketResult.isEmpty{
-            output.selectedTaskIDs.removeAll()
-            output.isSelectionMode = false
-            return
-        }
         
         //장바구니가 비면 선택 모드 종료
         guard !output.basketResult.isEmpty else {
@@ -272,7 +266,7 @@ final class BasketViewModel: ViewModelType {
         }
     }
     
-    private func updateSelectedTasksizes(level: SizeLevel){
+    private func updateSelectedTaskSizes(level: SizeLevel){
         let selectedTasks = output.basketResult.filter { task in
             output.selectedTaskIDs.contains(task.id)
         }
@@ -291,11 +285,6 @@ final class BasketViewModel: ViewModelType {
             for task in selectedTasks{
                 try repository.update(task)
             }
-            
-            try fetchTodoTask()
-            
-            output.selectedTaskIDs.removeAll()
-            output.isSelectionMode = false
         } catch {
             previousValues.forEach {
                 $0.task.sizeLevel = $0.level
@@ -303,6 +292,16 @@ final class BasketViewModel: ViewModelType {
             }
             
             print("일괄 크기 변경 실패: \(error)")
+            return
+        }
+        
+        output.selectedTaskIDs.removeAll()
+        output.isSelectionMode = false
+        
+        do{
+            try fetchTodoTask()
+        } catch {
+            print("일괄 크기 변경 성공, 목록 갱신 실패: \(error)")
         }
     }
 }
