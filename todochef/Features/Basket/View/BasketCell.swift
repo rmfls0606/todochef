@@ -91,7 +91,7 @@ struct BasketCell: View{
                 // TODO: 저장 실패 시 시트 닫히지 않게 하고 toast
                 onSheet = false
             })
-            .presentationDetents([.medium,.large])
+            .presentationDetents(.sizeToFit)
         }
         .onTapGesture {
             guard isSelectionMode else { return }
