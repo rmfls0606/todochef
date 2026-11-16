@@ -13,6 +13,8 @@ struct BasketView: View {
     @StateObject private var viewModel: BasketViewModel
     @FocusState private var isTodoInputFocused: Bool
     
+    @State private var batchSelectedLevel: SizeLevel = .three
+    
     init(viewModel: BasketViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
@@ -94,6 +96,55 @@ struct BasketView: View {
         }
         .onTapGesture {
             isTodoInputFocused = false
+        }
+        .safeAreaInset(edge: .bottom) {
+            if viewModel.output.isSelectionMode {
+                VStack(spacing: Spacing.lg) {
+                    VStack(spacing: Spacing.sm){
+                        HStack(spacing: Spacing.xs){
+                            Text(batchSelectedLevel.icon)
+                                .font(.shelfTitle)
+                            
+                            Text(batchSelectedLevel.label)
+                                .font(.bodyText)
+                                .fontWeight(.bold)
+                        }//: HSTACK
+                        
+                        Text(batchSelectedLevel.estimatedTime)
+                            .font(.bodyText)
+                    }//: VSTACK
+                    
+                    TaskSizeSlider(
+                        selectedLevel: $batchSelectedLevel
+                    )
+                    
+                    Button {
+                        viewModel.input.batchSizeConfirmed.send(
+                            batchSelectedLevel
+                        )
+                    } label: {
+                        Text("선택한 Task 크기 변경")
+                            .font(.bodyText)
+                            .hCenter()
+                            .padding(Spacing.sm)
+                            .background {
+                                RoundedRectangle(
+                                    cornerRadius: CornerRadius.medium
+                                )
+                                .fill(Color.orange)
+                            }
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(viewModel.output.selectedTaskIDs.isEmpty)
+                }//: VSTACK
+                .padding(Spacing.md)
+                .background(content: {
+                    RoundedRectangle(cornerRadius: CornerRadius.medium)
+                        .fill(Color.surface)
+                })
+                .padding(.horizontal, Spacing.lg)
+                .padding(.bottom, Spacing.sm)
+            }
         }
     }
     
