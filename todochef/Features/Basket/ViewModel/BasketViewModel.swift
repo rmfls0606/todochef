@@ -231,15 +231,18 @@ final class BasketViewModel: ViewModelType {
     private func updateTaskSize(_ task: Task, level: SizeLevel){
         let previousLevel = task.sizeLevel
         let previousStatus = task.status
+        let previousShelf = task.shelf
         
         task.sizeLevel = level
         task.status = .fridge
+        task.shelf = .storage
         
         do{
             try repository.update(task)
         }catch{
             task.sizeLevel = previousLevel
             task.status = previousStatus
+            task.shelf = previousShelf
             
             print("Task 크기 수정 실패: \(error)")
             return
@@ -275,6 +278,7 @@ final class BasketViewModel: ViewModelType {
         selectedTasks.forEach { task in
             task.sizeLevel = level
             task.status = .fridge
+            task.shelf = .storage
         }
         
         do{

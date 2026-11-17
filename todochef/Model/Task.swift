@@ -21,7 +21,9 @@ final class Task{
     var expiredAt: Date? // 유통기한(마감일)
     var sizeLevel: SizeLevel
     
-    init(id: UUID, title: String, content: String? = nil, inputType: InputType, mediaPath: String? = nil, status: Status, shelf: Shelf, cookedAt: Date? = nil, expiredAt: Date? = nil, sizeLevel: SizeLevel = .zero) {
+    var sortOrder: Int = 0
+    
+    init(id: UUID, title: String, content: String? = nil, inputType: InputType, mediaPath: String? = nil, status: Status, shelf: Shelf, cookedAt: Date? = nil, expiredAt: Date? = nil, sizeLevel: SizeLevel = .zero, sortOrder: Int = 0) {
         self.id = id
         self.title = title
         self.content = content
@@ -32,6 +34,7 @@ final class Task{
         self.cookedAt = cookedAt
         self.expiredAt = expiredAt
         self.sizeLevel = sizeLevel
+        self.sortOrder = sortOrder
     }
 }
 
@@ -51,9 +54,25 @@ enum Status: Codable{
 }
 
 //냉장고 선반 종류
-enum Shelf: Codable{
+enum Shelf: Codable, CaseIterable, Hashable{
+    case storage
     case today
     case tomorrow
     case week
     case later
+    
+    var title: String{
+        switch self {
+        case .storage:
+            "보관함"
+        case .today:
+            "오늘"
+        case .tomorrow:
+            "내일"
+        case .week:
+            "이번 주"
+        case .later:
+            "나중에"
+        }
+    }
 }
