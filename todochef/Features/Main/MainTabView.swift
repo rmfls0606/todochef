@@ -32,7 +32,7 @@ struct MainTabView: View {
         case .basket:
             BasketView(viewModel: diContainer.makeBasketViewModel())
         case .fridge:
-            FridgeView()
+            FridgeView(viewModel: diContainer.makeFridgeViewModel())
         case .counter:
             CounterView()
         case .cookbook:

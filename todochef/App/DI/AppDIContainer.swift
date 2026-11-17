@@ -25,4 +25,8 @@ final class AppDIContainer{
     func makeBasketViewModel() -> BasketViewModel{
         BasketViewModel(repository: taskRepositry)
     }
+    
+    func makeFridgeViewModel() -> FridgeViewModel{
+        FridgeViewModel(repository: taskRepositry)
+    }
 }
